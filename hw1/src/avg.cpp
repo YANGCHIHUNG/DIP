@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     mkdir("output", 0755);
 
-    if (!save_PPM("output/result.ppm", avgBuf.data(), width, height, channels)) {
+    if (!save_PPM("output/avg_result.ppm", avgBuf.data(), width, height, channels)) {
         std::cerr << "儲存結果失敗！\n";
         return 1;
     }
