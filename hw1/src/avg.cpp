@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <string>         // for std::to_string
 #include "jpeg_reader.h"
 #include "save_ppm.h"
 #include <sys/stat.h>
+#include <algorithm>      // for std::min
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -48,13 +50,17 @@ int main(int argc, char* argv[]) {
         avgBuf[i] = static_cast<unsigned char>(std::min(v, 255));
     }
 
+    // 確保 output 資料夾存在
     mkdir("output", 0755);
 
-    if (!save_PPM("output/avg_result.ppm", avgBuf.data(), width, height, channels)) {
-        std::cerr << "儲存結果失敗！\n";
+    // 建立輸出檔名：avg_result_<validCount>.ppm
+    std::string outPath = "output/avg_result_" + std::to_string(validCount) + ".ppm";
+
+    if (!save_PPM(outPath.c_str(), avgBuf.data(), width, height, channels)) {
+        std::cerr << "儲存結果失敗：" << outPath << "\n";
         return 1;
     }
 
-    std::cout << "完成！結果存入 result.ppm\n";
+    std::cout << "完成！結果存入 " << outPath << std::endl;
     return 0;
 }
