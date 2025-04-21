@@ -2,6 +2,7 @@
 #include <vector>
 #include "jpeg_reader.h"
 #include "save_ppm.h"
+#include <sys/stat.h>
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -47,7 +48,9 @@ int main(int argc, char* argv[]) {
         avgBuf[i] = static_cast<unsigned char>(std::min(v, 255));
     }
 
-    if (!save_PPM("result.ppm", avgBuf.data(), width, height, channels)) {
+    mkdir("output", 0755);
+
+    if (!save_PPM("output/result.ppm", avgBuf.data(), width, height, channels)) {
         std::cerr << "儲存結果失敗！\n";
         return 1;
     }
