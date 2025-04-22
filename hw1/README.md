@@ -25,22 +25,33 @@ hw1/
 
 ## 快速開始
 
-```bash
-# 進入專案資料夾
+1. 進入專案資料夾
+
+```
 cd hw1
-
-# 建置平均值合併執行檔\ nsh build_avg.sh
-
-# 建置中位數合併執行檔\ nsh build_median.sh
 ```
 
-執行程式，傳入多個 JPEG 檔案路徑：
+2. 建置平均值合併執行檔:
+
+```
+./build_avg.sh
+```
+
+3. 建置中位數合併執行檔:
+
+```
+./build_median.sh
+```
+
+4. 執行程式，傳入多個 JPEG 檔案路徑：
 
 ```bash
 ./avg image1.jpg image2.jpg image3.jpg
+# 或
+./median img1.jpg img2.jpg img3.jpg
 ```  
 
-結果會輸出至 `output/` 資料夾，檔名格式：
+5. 結果會輸出至 `output/` 資料夾，檔名格式：
 
 - **平均值：** `output/avg_result_<N>.ppm`  
 - **中位數：** `output/median_result_<N>.ppm`  
