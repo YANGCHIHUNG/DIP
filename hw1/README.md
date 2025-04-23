@@ -1,20 +1,22 @@
 # DIP 影像處理作業 1
 
-本專案透過多張同一場景的 JPEG 影像進行像素值相加取平均與中位數計算，以去除影像中的隨機噪點，並將結果輸出為 PPM 格式影像。
+本專案透過多張同一場景的 JPEG 影像進行像素值相加取平均與中位數計算，以去除影像中的隨機噪點。
 
 ## 目錄結構
 ```
 hw1/
+├─ img/                 // 存放輸入測試的 JPEG 檔案
 ├─ include/
 │  ├─ jpeg_reader.h
 │  └─ save_ppm.h
 ├─ src/
-│  ├─ avg.cpp        // 平均值合併
-│  ├─ median.cpp     // 中位數合併
-│  ├─ jpeg_reader.cpp// JPEG 讀取實作
-│  └─ save_ppm.cpp   // PPM 輸出實作
-├─ build_avg.sh      // 編譯 avg
-└─ build_median.sh   // 編譯 median
+│  ├─ avg.cpp           // 平均值合併（去噪）
+│  ├─ median.cpp        // 中位數合併（去噪）
+│  ├─ jpeg_reader.cpp   // JPEG 讀取實作
+│  └─ save_ppm.cpp      // PPM 輸出實作
+├─ output/              // 存放結果 PPM 檔案
+├─ build_avg.sh         // 編譯 avg
+└─ build_median.sh      // 編譯 median
 ```  
 
 ## 相依性
