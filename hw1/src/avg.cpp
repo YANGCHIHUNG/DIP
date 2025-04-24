@@ -1,32 +1,48 @@
 #include <iostream>
 #include <vector>
-#include <string>         // for std::to_string
+#include <string>
 #include "jpeg_reader.h"
 #include "save_ppm.h"
 #include <sys/stat.h>
-#include <algorithm>      // for std::min
+#include <algorithm>
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cerr << "請提供至少一個 JPEG 檔案作為輸入。\n";
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <image_count>\n";
         return 1;
     }
 
-    int totalImages = argc - 1;
+    int totalImages = 0;
+    try {
+        totalImages = std::stoi(argv[1]);
+    } catch (...) {
+        std::cerr << "請提供合法的整數作為圖片數量。\n";
+        return 1;
+    }
+    if (totalImages <= 0) {
+        std::cerr << "圖片數量必須大於 0。\n";
+        return 1;
+    }
+
     int width = 0, height = 0, channels = 0;
     std::vector<int> sumBuffer;
     int validCount = 0;
+    const std::string imgDir = "img";
 
     for (int i = 1; i <= totalImages; ++i) {
+        std::string path = imgDir + "/img" + std::to_string(i) + ".jpg";
         int w, h, c;
-        unsigned char* buf = read_JPEG_file(argv[i], w, h, c);
-        if (!buf) continue;
+        unsigned char* buf = read_JPEG_file(path.c_str(), w, h, c);
+        if (!buf) {
+            std::cerr << "讀取失敗，跳過 " << path << "\n";
+            continue;
+        }
 
         if (validCount == 0) {
             width = w; height = h; channels = c;
             sumBuffer.assign(width * height * channels, 0);
         } else if (w != width || h != height || c != channels) {
-            std::cerr << "警告：尺寸不符，跳過 " << argv[i] << "\n";
+            std::cerr << "警告：尺寸不符，跳過 " << path << "\n";
             delete[] buf;
             continue;
         }
@@ -50,12 +66,8 @@ int main(int argc, char* argv[]) {
         avgBuf[i] = static_cast<unsigned char>(std::min(v, 255));
     }
 
-    // 確保 output 資料夾存在
     mkdir("output", 0755);
-
-    // 建立輸出檔名：avg_result_<validCount>.ppm
     std::string outPath = "output/avg_result_" + std::to_string(validCount) + ".ppm";
-
     if (!save_PPM(outPath.c_str(), avgBuf.data(), width, height, channels)) {
         std::cerr << "儲存結果失敗：" << outPath << "\n";
         return 1;
