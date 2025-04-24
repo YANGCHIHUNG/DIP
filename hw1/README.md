@@ -100,10 +100,9 @@ cd hw1
 ### 輸入範例  
 <img src="img/img1.jpg" alt="輸入影像範例" width="300"/>
 
-### 平均值去噪結果  
-<img src="static/avg_result_10.jpg" alt="平均值去噪結果（10 張）" width="300"/>
-<img src="static/avg_result_140.jpg" alt="平均值去噪結果（140 張）" width="300"/>
+### 去噪結果比較
 
-### 中位數去噪結果  
-<img src="static/median_result_10.jpg" alt="中位數去噪結果（10 張）" width="300"/>
-<img src="static/median_result_140.jpg" alt="中位數去噪結果（140 張）" width="300"/>
+| 方法       | 10 張示例                                                                 | 140 張示例                                                                |
+| ---------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| 平均值去噪 | <img src="static/avg_result_10.jpg"  alt="平均值去噪結果（10 張）"  width="300"/> | <img src="static/avg_result_140.jpg" alt="平均值去噪結果（140 張）" width="300"/> |
+| 中位數去噪 | <img src="static/median_result_10.jpg"  alt="中位數去噪結果（10 張）"  width="300"/> | <img src="static/median_result_140.jpg" alt="中位數去噪結果（140 張）" width="300"/> |
