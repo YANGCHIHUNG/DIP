@@ -16,7 +16,8 @@ hw1/
 │  └─ save_ppm.cpp      // PPM 輸出實作
 ├─ output/              // 存放結果 PPM 檔案
 ├─ build_avg.sh         // 編譯 avg
-└─ build_median.sh      // 編譯 median
+├─ build_median.sh      // 編譯 median
+└─ ppm_to_jpg.py        // 將 ppm 檔轉成 jpg 檔
 ```  
 
 ## 相依性
@@ -100,9 +101,9 @@ cd hw1
 <img src="img/img1.jpg" alt="輸入影像範例" width="300"/>
 
 ### 平均值去噪結果  
-<img src="output/avg_result_10.ppm" alt="平均值去噪結果（10 張）" width="300"/>
-<img src="output/avg_result_140.ppm" alt="平均值去噪結果（140 張）" width="300"/>
+<img src="static/avg_result_10.jpg" alt="平均值去噪結果（10 張）" width="300"/>
+<img src="static/avg_result_140.jpg" alt="平均值去噪結果（140 張）" width="300"/>
 
 ### 中位數去噪結果  
-<img src="output/median_result_10.ppm" alt="中位數去噪結果（10 張）" width="300"/>
-<img src="output/median_result_140.ppm" alt="中位數去噪結果（140 張）" width="300"/>
+<img src="static/median_result_10.jpg" alt="中位數去噪結果（10 張）" width="300"/>
+<img src="static/median_result_140.jpg" alt="中位數去噪結果（140 張）" width="300"/>
