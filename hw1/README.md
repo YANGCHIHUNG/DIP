@@ -105,6 +105,6 @@ cd hw1
 
 | 方法       | 10 張示例                                                                 | 140 張示例                                                               |
 | ---------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| 平均值去噪 | <img src="static/avg_result_10.jpg" alt="平均值去噪結果（10 張）" width="300"/> | <img src="static/avg_result_140.jpg" alt="平均值去噪結果（140 張）" width="300"/> 
-| 中位數去噪 | <img src="static/median_result_10.jpg" alt="中位數去噪結果（10 張）" width="300"/> | <img src="static/median_result_140.jpg" alt="中位數去噪結果（140 張）" width="300"/> |
+| 平均值去噪 | <img src="static/avg_result_10.jpg" alt="平均值去噪結果（10 張）" width="800"/> | <img src="static/avg_result_140.jpg" alt="平均值去噪結果（140 張）" width="800"/> 
+| 中位數去噪 | <img src="static/median_result_10.jpg" alt="中位數去噪結果（10 張）" width="800"/> | <img src="static/median_result_140.jpg" alt="中位數去噪結果（140 張）" width="800"/> |
 | 說明 | _經過處理後，放大觀看噪點已明顯減少_ | _與 10 張對比，明顯已經幾乎看不出噪點_ |
