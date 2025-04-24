@@ -45,12 +45,12 @@ cd hw1
 ./build_median.sh
 ```
 
-4. 執行程式，傳入多個 JPEG 檔案路徑：
-
+4. 執行程式，傳入一個整數（代表要處理的圖片數量），圖片檔案固定放在 `img/img1.jpg`, `img/img2.jpg` … `img/imgN.jpg`：
 ```bash
-./avg image1.jpg image2.jpg image3.jpg
-# 或
-./median img1.jpg img2.jpg img3.jpg
+# 平均值去噪
+./avg <image_count>
+# 或中位數去噪
+./median <image_count>
 ```  
 
 5. 結果會輸出至 `output/` 資料夾，檔名格式：
@@ -79,14 +79,30 @@ cd hw1
 ### 平均值合併
 
 ```bash
-./avg sample1.jpg sample2.jpg sample3.jpg
+# 若 img 資料夾中有 3 張 JPEG： img/1.jpg, img/2.jpg, img/3.jpg
+./avg 3
 # 完成！結果存入 output/avg_result_3.ppm
 ```
 
 ### 中位數合併
 
 ```bash
-./median sample1.jpg sample2.jpg sample3.jpg
-# 完成！結果存入 output/median_result_3.ppm
+# 若 img 資料夾中有 5 張 JPEG： img/1.jpg … img/5.jpg
+./median 5
+# 完成！結果存入 output/median_result_5.ppm
 ```
 
+## 結果
+
+以下展示部分輸入與輸出圖片（請確保檔案路徑正確）：
+
+### 輸入範例  
+<img src="img/img1.jpg" alt="輸入影像範例" width="300"/>
+
+### 平均值去噪結果  
+<img src="output/avg_result_10.ppm" alt="平均值去噪結果（10 張）" width="300"/>
+<img src="output/avg_result_140.ppm" alt="平均值去噪結果（140 張）" width="300"/>
+
+### 中位數去噪結果  
+<img src="output/median_result_10.ppm" alt="中位數去噪結果（10 張）" width="300"/>
+<img src="output/median_result_140.ppm" alt="中位數去噪結果（140 張）" width="300"/>
