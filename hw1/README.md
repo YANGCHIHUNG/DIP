@@ -99,7 +99,7 @@ cd hw1
 
 ### 輸入範例  
 放大明顯看會發現有許多噪點  
-<img src="img/img1.jpg" alt="輸入影像範例" width="600"/>
+<img src="img/img1.jpg" alt="輸入影像範例" width="800"/>
 
 ### 去噪結果比較
 
