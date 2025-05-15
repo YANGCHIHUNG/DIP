@@ -76,3 +76,19 @@
 1. 實作程式（或 Notebook）
 2. 中間結果影像（edge1、edge2、smooth1、fusionA、resultA、fusionB、resultB）
 3. 簡短說明文件（各步驟原理、參數選擇依據、視覺效果比較）
+
+
+python inference_realesrgan.py \
+  -n RealESRGAN_x4plus \
+  -i /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png \
+  --outscale 4 \
+  --face_enhance
+
+
+python inference_realesrgan.py \
+  -n RealESRGAN_x4plus \
+  -i /Users/young/Documents/nchu-2024-fall/LA/HW4/SaveInsta.to_476488059_18357903655135549_9131945504073213709_n.jpg \
+  --outscale 4 \
+  --tile 200 \
+  --tile_pad 10
+
