@@ -13,7 +13,7 @@
 輸入：多張重疊且視角略有差異的影像（需三張以上）
 輸出：一張無縫接合的全景影像
 要求：
-- Affine transform 不可依靠套件
+- Affine transform 不可依靠套件 (`transformer.py` )
 
 ## 二、主要程式檔與模組職責
 
@@ -31,113 +31,130 @@
 
 ## 三、工作流程
 
-下面示意 Panorama 作業的執行流程，依序說明每個步驟的核心功能，並提供主要程式碼範例：
+以下是在每個流程步驟中，插入專案對應程式碼的詳細說明：
 
-1. **讀入影像**
+1. **影像讀取與前處理（`loader.py`）**  
 
-   ```python
-   # main.py
-   import os, cv2
-   parser.add_argument('--input_dir', required=True)
-   args = parser.parse_args()
-   file_list = sorted(os.listdir(args.input_dir))
-   images = [cv2.imread(os.path.join(args.input_dir, f)) for f in file_list]
-   ```
+```python
+from src.loader import load_images_from_dir, preprocess_image
 
-   * 讀取指定資料夾所有影像，載入為 NumPy 陣列。
+# 批次載入 data/input 資料夾
+images_dict = load_images_from_dir('data/input/')
+# 若需要灰階或縮放
+gray = preprocess_image(img, to_gray=True, resize=(800,600))
 
-2. **特徵偵測與描述**
+```
 
-   ```python
-   # feature.py
-   import cv2
+- load_images_from_dir 會回傳 {'img1.jpg': ndarray, …}
+- preprocess_image 支援灰階轉換與鎖定尺寸
 
-   def detect_and_compute(img, method='ORB'):
-       if method == 'ORB':
-           detector = cv2.ORB_create()
-       else:
-           detector = cv2.SIFT_create()
-       keypoints, descriptors = detector.detectAndCompute(img, None)
-       return keypoints, descriptors
-   ```
+2. **影像讀取與前處理（`loader.py`）** 
 
-   * 使用 ORB 或 SIFT 偵測關鍵點並計算描述子。
+```python
+from src.feature import get_feature_detector, detect_and_compute
 
-3. **特徵匹配**
+# 建立 ORB 偵測器
+detector = get_feature_detector('ORB', nfeatures=2000)
+# 計算關鍵點與描述子
+kp, des = detect_and_compute(detector, gray_image)
+```
+3.	**描述子匹配（`matcher.py`）**  
 
-   ```python
-   # matcher.py
-   import cv2
+```python
+from src.matcher import create_matcher, match_descriptors
 
-   def match_features(des1, des2):
-       bf = cv2.BFMatcher()
-       matches = bf.knnMatch(des1, des2, k=2)
-       good = [m for m, n in matches if m.distance < 0.75 * n.distance]
-       return good
-   ```
+# 建立 BFMatcher
+matcher = create_matcher('BF', norm_type=cv2.NORM_HAMMING, cross_check=False)
+# KNN + Lowe's ratio test，取前 50 筆
+matches = match_descriptors(
+    matcher, des1, des2,
+    ratio_test=True, ratio=0.75, top_k=50
+)
+```
 
-   * 使用 BFMatcher + Lowe’s ratio test 篩選優質匹配。
+4.	**仿射矩陣估算與串接（`transformer.py`）**  
 
-4. **單應性估計**
+```python
+from src.transformer import estimate_affine_transform, compose_transforms
 
-   ```python
-   # estimator.py
-   import cv2
-   import numpy as np
+# src_pts, dst_pts shape 都為 (N,1,2)
+M23, inlier_mask = estimate_affine_transform(
+    src_pts, dst_pts,
+    ransac_thresh=5.0, max_iters=2000
+)
+# 若要多段串接：
+M3x3 = np.vstack([M23, [0,0,1]])
+T_total = compose_transforms([M3x3, prev_T])
+```
 
-   def estimate_homography(kps1, kps2, matches, threshold=5.0):
-       src_pts = np.float32([kps1[m.queryIdx].pt for m in matches]).reshape(-1,1,2)
-       dst_pts = np.float32([kps2[m.trainIdx].pt for m in matches]).reshape(-1,1,2)
-       H, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, threshold)
-       return H, mask
-   ```
+5.	**畫布大小計算**  
 
-   * 以 RANSAC 剔除外點並估計 3×3 單應矩陣。
+```python
+# 計算所有影像投影後的四角
+all_corners = []
+for img, T in zip(imgs, transforms):
+    h, w = img.shape[:2]
+    corners = np.array([[0,0,1],[w,0,1],[w,h,1],[0,h,1]]).T
+    proj = T @ corners
+    proj = proj[:2] / proj[2]
+    all_corners.append(proj.T)
+all_pts = np.vstack(all_corners)
+min_x, min_y = np.min(all_pts, axis=0)
+max_x, max_y = np.max(all_pts, axis=0)
+```
 
-5. **影像投影**
 
-   ```python
-   # stitcher.py
-   width = panorama.shape[1] + img.shape[1]
-   height = max(panorama.shape[0], img.shape[0])
-   warped = cv2.warpPerspective(img, H, (width, height))
-   ```
+6.	**影像 Warp（`transformer.py`）** 
 
-   * 根據 H 對新影像做透視投影，擴展畫布以容納所有影像。
+```python
+from src.transformer import warp_image
 
-6. **影像融合**
+# 對每張影像貼到畫布
+warp = warp_image(
+    img,       # 原圖
+    M[:2],     # 2x3 仿射矩陣
+    (out_w, out_h),
+    flags=cv2.INTER_LINEAR,
+    borderMode=cv2.BORDER_CONSTANT,
+    borderValue=0
+)
+# 同時計算 mask
+mask = warp_image(
+    np.ones((h,w),dtype=np.uint8)*255,
+    M[:2], (out_w, out_h)
+)
+```
 
-   ```python
-   # blender.py
-   import numpy as np
+7.	**影像融合（`blender.py`）**  
 
-   def warp_perspective_and_blend(base, warped):
-       h_base, w_base = base.shape[:2]
-       result = np.zeros_like(warped)
-       result[:h_base, :w_base] = base
+```python
+from src.blender import blend_images
 
-       mask = np.any(warped != 0, axis=2).astype(np.float32)[..., None]
-       result = result * (1 - mask) + warped * mask
-       return result.astype(base.dtype)
-   ```
+# 第一張直接貼上
+panorama = warp_images[0]
+# 後續逐張混合
+panorama = blend_images(
+    panorama, warped, mask,
+    method='feather', blur_radius=21
+)
+```
 
-   * 建立遮罩並對重疊區做線性加權羽化融合。
+8.	**整合驅動（`stitcher.py`）**  
 
-7. **迭代累積**
+```python
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', required=True)
+    parser.add_argument('--input',  required=True)
+    parser.add_argument('--output', required=True)
+    args = parser.parse_args()
+    stitch_images(args.config, args.input, args.output)
+```
+- stitch_images 依序呼叫上面各模組，處理錯誤檢查並輸出結果
 
-   ```python
-   # stitcher.py
-   panorama = images[0]
-   for img in images[1:]:
-       kps1, des1 = detect_and_compute(panorama)
-       kps2, des2 = detect_and_compute(img)
-       matches = match_features(des1, des2)
-       H, mask = estimate_homography(kps1, kps2, matches)
-       warped = cv2.warpPerspective(img, H, (width, height))
-       panorama = warp_perspective_and_blend(panorama, warped)
-   ```
+⸻
 
-   * 以前一輪合併結果作為新基準，重複步驟 2–6，直到所有影像完成拼接。
+如此，每個演算法步驟都對應到專案中具體的程式碼片段，方便閱讀與維護！
 
 ## 四、成果範例展示
 
@@ -149,3 +166,8 @@
 
 - **輸出全景圖**：`data/output/panorama_example.jpg`
   ![Example Output Panorama](../output/panorama.jpg)
+
+## 五、討論
+
+多虧於現今LLM的技術使這份作業簡單得許多，如果沒有LLM肯定要花上數倍的時間，甚至無法完成。但即使是使用了LLM，無法使用cv2來實作affine transform也讓我額外花了更多時間開發影像拼接。
+這份作業讓我更加了解影像拼接的流程，以及還能夠使用哪些演算法來實作出來。
