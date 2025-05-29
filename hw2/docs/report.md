@@ -27,7 +27,7 @@
 | `matcher.py`                     | 描述子匹配邏輯（BFMatcher、FlannBasedMatcher 與 Lowe’s ratio test） |
 | `transformer.py`                 | 仿射矩陣估算（RANSAC）、影像仿射變形與矩陣合成                 |
 | `blender.py`                     | 影像融合方法（羽化混合 feather、金字塔多頻帶 multiband）        |
-| `stitcher.py`                    | 主拼接流程整合：讀設定、載入影像、估算變換、Warp、混合、輸出      |                                                                               |
+| `stitcher.py`                    | 主拼接流程整合：讀設定、載入影像、估算變換、Warp、混合、輸出      |         
 
 ## 三、工作流程
 
