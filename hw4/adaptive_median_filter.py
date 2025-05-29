@@ -1,101 +1,91 @@
 '''
-python adaptive_median_filter.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_01.jpg /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/adaptive_denoisy_01.jpg -m 3
+python adaptive_median_filter.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_01.jpg /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/adaptive_denoisy_01.jpg -m 31
+python adaptive_median_filter.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_25.jpg /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/adaptive_denoisy_25.jpg -m 15
 '''
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import cv2
 import numpy as np
+import argparse
+import sys
 
-def adaptive_median_filter(img: np.ndarray, max_ksize: int = 7) -> np.ndarray:
+def adaptive_median_filter(img: np.ndarray, s_max: int) -> np.ndarray:
     """
-    自適應中值濾波 (Adaptive Median Filter) 核心，僅支援單通道灰階。
-
-    參數：
-    - img: 灰階影像 (H, W)，dtype 任意整數型別
-    - max_ksize: 最大視窗大小 (必須為奇數，>=3)
-
-    回傳：
-    - filtered: 濾波後灰階影像，同 dtype
+    自適應中值濾波器 (輸入單通道灰階影像)
+    img    : np.ndarray, 灰階影像
+    s_max  : int, 最大視窗邊長 (必須為奇數)
+    回傳   : np.ndarray, 除躁後的灰階影像
     """
-    assert img.ndim == 2, "adaptive_median_filter 只支援單通道"
-    assert max_ksize % 2 == 1 and max_ksize >= 3, "max_ksize 必須為大於等於 3 的奇數"
+    # Padding：以最大視窗半徑作零填充
+    pad = s_max // 2
+    padded = np.pad(img, pad_width=pad, mode='reflect')
+    output = img.copy()
+    rows, cols = img.shape
 
-    H, W = img.shape
-    Smax = max_ksize
-    filtered = np.zeros_like(img)
-    pad = Smax // 2
-    padded = np.pad(img, pad, mode='edge')
-
-    for y in range(H):
-        for x in range(W):
-            S = 3
-            z0 = int(padded[y + pad, x + pad])
+    for i in range(rows):
+        for j in range(cols):
+            window_size = 7  # 從 3×3 開始
             while True:
-                off = S // 2
-                window = padded[
-                    y + pad - off : y + pad + off + 1,
-                    x + pad - off : x + pad + off + 1
-                ].ravel()
-                Zmin = int(window.min())
-                Zmax = int(window.max())
-                Zmed = int(np.median(window))
-                A1 = Zmed - Zmin
-                A2 = Zmed - Zmax
-                # Stage A
-                if A1 > 0 and A2 < 0:
-                    # Stage B
-                    B1 = z0 - Zmin
-                    B2 = z0 - Zmax
-                    filtered[y, x] = z0 if (B1 > 0 and B2 < 0) else Zmed
+                half = window_size // 2
+                # 取出當前視窗
+                local = padded[i : i + window_size, j : j + window_size]
+                z_min = local.min()
+                z_med = np.median(local)
+                z_max = local.max()
+                z_xy  = padded[i + half, j + half]
+
+                # Step A: 檢查中值是否在最小值與最大值之間
+                if z_min < z_med < z_max:
+                    # Step B: 檢查當前像素是否等於中值
+                    output[i, j] = z_med if z_xy != z_med else z_xy
                     break
-                S += 2
-                if S > Smax:
-                    filtered[y, x] = Zmed
-                    break
-    return filtered
+                else:
+                    window_size += 2  # 每次擴增視窗邊長 2
+                    if window_size > s_max:
+                        # 超過最大視窗時，直接以中值替代
+                        output[i, j] = z_med
+                        break
 
+    return output
 
-def adaptive_median_filter_color(input_path: str, output_path: str, max_ksize: int = 7) -> None:
-    """
-    讀取彩色影像，拆通道獨立做自適應中值濾波，重建彩色輸出。
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Adaptive Median Filter (灰階版)\n"
+                    "範例：python adaptive_median_filter.py input.jpg output.jpg -m 31"
+    )
+    parser.add_argument("input_path", help="輸入影像路徑 (灰階)")
+    parser.add_argument("output_path", help="輸出影像路徑")
+    parser.add_argument(
+        "-m", "--max_window", type=int, default=31,
+        help="最大視窗邊長 (預設 31，必須為奇數)"
+    )
+    return parser.parse_args()
 
-    參數：
-    - input_path: 輸入 BGR 影像路徑
-    - output_path: 濾波後 BGR 影像儲存路徑
-    - max_ksize: 最大視窗大小 (奇數，>=3)
-    """
-    # 讀彩色，強制 BGR
-    img_bgr = cv2.imread(input_path, cv2.IMREAD_COLOR)
-    if img_bgr is None:
-        raise FileNotFoundError(f"找不到影像：{input_path}")
+def main():
+    args = parse_args()
 
-    # 拆成三個通道
-    b, g, r = cv2.split(img_bgr)
+    # 以灰階讀取
+    img = cv2.imread(args.input_path, cv2.IMREAD_GRAYSCALE)
+    if img is None:
+        print(f"無法讀取影像：{args.input_path}", file=sys.stderr)
+        sys.exit(1)
 
-    # 對每個通道做自適應中值濾波
-    b_d = adaptive_median_filter(b, max_ksize).astype(b.dtype)
-    g_d = adaptive_median_filter(g, max_ksize).astype(g.dtype)
-    r_d = adaptive_median_filter(r, max_ksize).astype(r.dtype)
+    # 檢查 max_window 是否為奇數
+    if args.max_window % 2 == 0:
+        print("錯誤：-m/--max_window 必須為奇數", file=sys.stderr)
+        sys.exit(1)
 
-    # 合併回 BGR
-    denoised = cv2.merge([b_d, g_d, r_d])
+    denoised = adaptive_median_filter(img, args.max_window)
 
-    # 存檔
-    cv2.imwrite(output_path, denoised)
-    print(f"已將拆通道自適應中值濾波後彩色影像儲存至：{output_path}")
+    # 儲存結果（灰階）
+    success = cv2.imwrite(args.output_path, denoised)
+    if not success:
+        print(f"儲存影像失敗：{args.output_path}", file=sys.stderr)
+        sys.exit(1)
 
+    print(f"除躁完成，已儲存至：{args.output_path}")
 
 if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Adaptive Median Filter for Color Images (Channel-wise)")
-    parser.add_argument("input", help="輸入影像檔路徑 (BGR)")
-    parser.add_argument("output", help="輸出影像檔路徑")
-    parser.add_argument(
-        "-m", "--max", type=int, default=7,
-        help="最大視窗大小 (奇數，>=3)"
-    )
-    args = parser.parse_args()
-
-    if args.max < 3 or args.max % 2 == 0:
-        parser.error("max 必須為大於等於 3 的奇數")
-
-    adaptive_median_filter_color(args.input, args.output, args.max)
+    main()
