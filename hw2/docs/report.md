@@ -36,7 +36,7 @@
 1. **影像讀取與前處理（`loader.py`）**  
 
 ```python
-from src.loader import load_images_from_dir, preprocess_image
+from loader import load_images_from_dir, preprocess_image
 
 # 批次載入 data/input 資料夾
 images_dict = load_images_from_dir('data/input/')
@@ -51,7 +51,7 @@ gray = preprocess_image(img, to_gray=True, resize=(800,600))
 2. **影像讀取與前處理（`loader.py`）** 
 
 ```python
-from src.feature import get_feature_detector, detect_and_compute
+from feature import get_feature_detector, detect_and_compute
 
 # 建立 ORB 偵測器
 detector = get_feature_detector('ORB', nfeatures=2000)
@@ -61,7 +61,7 @@ kp, des = detect_and_compute(detector, gray_image)
 3.	**描述子匹配（`matcher.py`）**  
 
 ```python
-from src.matcher import create_matcher, match_descriptors
+from matcher import create_matcher, match_descriptors
 
 # 建立 BFMatcher
 matcher = create_matcher('BF', norm_type=cv2.NORM_HAMMING, cross_check=False)
@@ -75,7 +75,7 @@ matches = match_descriptors(
 4.	**仿射矩陣估算與串接（`transformer.py`）**  
 
 ```python
-from src.transformer import estimate_affine_transform, compose_transforms
+from transformer import estimate_affine_transform, compose_transforms
 
 # src_pts, dst_pts shape 都為 (N,1,2)
 M23, inlier_mask = estimate_affine_transform(
@@ -107,7 +107,7 @@ max_x, max_y = np.max(all_pts, axis=0)
 6.	**影像 Warp（`transformer.py`）** 
 
 ```python
-from src.transformer import warp_image
+from transformer import warp_image
 
 # 對每張影像貼到畫布
 warp = warp_image(
@@ -128,7 +128,7 @@ mask = warp_image(
 7.	**影像融合（`blender.py`）**  
 
 ```python
-from src.blender import blend_images
+from blender import blend_images
 
 # 第一張直接貼上
 panorama = warp_images[0]
@@ -169,5 +169,116 @@ if __name__ == '__main__':
 
 ## 五、討論
 
-多虧於現今LLM的技術使這份作業簡單得許多，如果沒有LLM肯定要花上數倍的時間，甚至無法完成。但即使是使用了LLM，無法使用cv2來實作affine transform也讓我額外花了更多時間開發影像拼接。
+多虧於現今LLM的技術使這份作業簡單得許多，如果沒有LLM肯定要花上數倍的時間，甚至無法完成。
+但即使是使用了LLM，無法使用cv2來實作affine transform也讓我額外花了更多時間開發影像拼接。
 這份作業讓我更加了解影像拼接的流程，以及還能夠使用哪些演算法來實作出來。
+
+## 六、Affine Transform
+
+```python
+def estimate_affine_ransac(src_pts, dst_pts, ransac_thresh=5.0, max_iters=2000):
+    """
+    使用 RANSAC 從 src_pts → dst_pts 估算 2x3 仿射矩陣。
+    回傳:
+      M   : (2,3) 仿射矩陣
+      mask: (N,) 內點標記 1/0
+    """
+    N = src_pts.shape[0]
+    if N < 3:
+        raise ValueError("至少需要 3 對點才能估算仿射變換。")
+    
+    best_M = None
+    best_inliers = np.zeros(N, dtype=bool)
+    best_count = 0
+
+    # 將點加上常數項，方便一次求解
+    def solve_affine(p_src, p_dst):
+        # p_src, p_dst shape=(k,2)，k>=3
+        # 方程: [ x y 1 0 0 0 ] [a]   [x']
+        #         [ 0 0 0 x y 1 ] [b] = [y']
+        A = []
+        b = []
+        for (x, y), (xp, yp) in zip(p_src, p_dst):
+            A.append([x, y, 1, 0, 0, 0])
+            A.append([0, 0, 0, x, y, 1])
+            b.append(xp)
+            b.append(yp)
+        A = np.array(A)    # shape=(2k,6)
+        b = np.array(b)    # shape=(2k,)
+        # 最小二乘解
+        x, *_ = np.linalg.lstsq(A, b, rcond=None)
+        # x = [a, b, tx, c, d, ty]
+        return np.array([[x[0], x[1], x[2]],
+                         [x[3], x[4], x[5]]])
+
+    for i in range(max_iters):
+        # 隨機抽 3 對點
+        idx = np.random.choice(N, size=3, replace=False)
+        M_candidate = solve_affine(src_pts[idx], dst_pts[idx])
+
+        # 計算所有點的重投影誤差
+        src_h = np.hstack([src_pts, np.ones((N,1))])       # shape=(N,3)
+        proj = (M_candidate @ src_h.T).T                   # shape=(N,2)
+        errs = np.linalg.norm(proj - dst_pts, axis=1)      # shape=(N,)
+
+        # 以閾值分類內點
+        inliers = errs < ransac_thresh
+        count = inliers.sum()
+
+        if count > best_count:
+            best_count = count
+            best_inliers = inliers
+            best_M = M_candidate
+
+            # 若已經大部分皆為內點，就可提早停止
+            if count > 0.8 * N:
+                break
+
+    if best_M is None:
+        raise RuntimeError("RANSAC 無法估算出有效模型。")
+
+    # 用所有內點再做一次最小二乘擬合以精緻化矩陣
+    best_M = solve_affine(src_pts[best_inliers], dst_pts[best_inliers])
+
+    # 回傳 M 與內點遮罩（1/0）
+    return best_M, best_inliers.astype(np.uint8)
+
+
+def estimate_affine_transform(kp1, kp2, matches, ransac_thresh=5.0, max_iters=2000):
+    """
+    根據匹配的關鍵點估算仿射變換矩陣。
+
+    參數:
+    - kp1 (list of cv2.KeyPoint): 參考影像的關鍵點
+    - kp2 (list of cv2.KeyPoint): 待變換影像的關鍵點
+    - matches (list of cv2.DMatch): 兩影像之間的匹配列表
+    - ransac_thresh (float): RANSAC 重投影閾值，預設 5.0
+    - max_iters (int): RANSAC 最大迭代次數，預設 2000
+
+    回傳:
+    - M (ndarray of shape (2,3)): 估算出的仿射矩陣
+    - mask (ndarray): 表示內點(inliers)的遮罩
+    """
+    # 構造點陣
+    src_pts = np.float32([kp2[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
+    dst_pts = np.float32([kp1[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
+
+    '''
+    # 使用 RANSAC 估算仿射矩陣
+    M, mask = cv2.estimateAffinePartial2D(
+        src_pts,
+        dst_pts,
+        method=cv2.RANSAC,
+        ransacReprojThreshold=ransac_thresh,
+        maxIters=max_iters
+    )
+    '''
+
+    src = src_pts.reshape(-1, 2)
+    dst = dst_pts.reshape(-1, 2)
+    M, mask = estimate_affine_ransac(src, dst,
+                                    ransac_thresh=ransac_thresh,
+                                    max_iters=max_iters)
+
+    return M, mask
+```
