@@ -5,6 +5,7 @@ sobel.py
 
 python sobel.py input_image output.jpg [quality]
 python sobel.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/blur_img.png /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/sobel_blur_img.png
+python sobel.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/sobel.jpg
 
 功能：
 1. 用 Pillow 讀入任意影像檔 (jpg/png/pgm...)

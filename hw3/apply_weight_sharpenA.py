@@ -17,9 +17,9 @@ apply_weight_sharpenA.py
 
   python apply_weight_sharpenA.py \
       --original /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png \
-      --sharpen /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/laplacian_sharpen_img.jpg \
-      --weight /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/weight.png \
-      --output /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/img_resultA.png
+      --sharpen /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/laplacian_sharpen.jpg \
+      --weight /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/weight.jpg \
+      --output /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/resultA.png
 參數：
   --original   原始彩色影像路徑
   --sharpen    二階銳化後的彩色影像路徑

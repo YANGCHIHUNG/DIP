@@ -13,7 +13,7 @@ laplacian_sharpen.py
   pip install pillow
   python laplacian_sharpen.py input.jpg output.jpg [alpha]
 
-  python laplacian_sharpen.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/laplacian_sharpen_img.jpg 1.5
+  python laplacian_sharpen.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/laplacian_sharpen.jpg 4
 
 參數：
   input.jpg   原始影像路徑

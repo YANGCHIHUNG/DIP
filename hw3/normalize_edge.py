@@ -12,7 +12,7 @@ normalize_edge.py
 使用：
   pip install pillow
   python normalize_edge.py edge.png [weight.png] [threshold]
-  python normalize_edge.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/sobel_blur_img.png /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/weight.png 0.2
+  python normalize_edge.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/blur_sobel.jpg /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/weight.jpg 0.2
 
 參數：
   edge.png      輸入的邊緣圖 (灰階)

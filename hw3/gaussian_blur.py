@@ -12,7 +12,7 @@ gaussian_blur.py
 使用：
   pip install pillow
   python gaussian_blur.py input.jpg output.jpg --ksize 5 --sigma 1.0
-  python gaussian_blur.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/blur_img.png --ksize 5 --sigma 1.0
+  python gaussian_blur.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/sobel.jpg /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/blur_sobel.jpg --ksize 5 --sigma 1.0
 """
 
 import sys
