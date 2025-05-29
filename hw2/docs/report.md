@@ -145,14 +145,9 @@
 
 以下展示輸入影像與拼接後輸出結果示例，
 
-- **範例輸入影像 1**：`data/input/example1.jpg`
-  ![Example Input 1](../input/a.png)
-
-- **範例輸入影像 2**：`data/input/example2.jpg`
-  ![Example Input 2](../input/b.png)
-
-- **範例輸入影像 3**：`data/input/example3.jpg`
-  ![Example Input 3](../input/c.png)
+| 範例輸入影像 1 | 範例輸入影像 2 | 範例輸入影像 3 |
+|:--------------:|:--------------:|:--------------:|
+| ![範例輸入影像 1](../input/a.png) | ![範例輸入影像 2](../input/b.png) | ![範例輸入影像 3](../input/c.png) |
 
 - **輸出全景圖**：`data/output/panorama_example.jpg`
   ![Example Output Panorama](../output/panorama.jpg)
