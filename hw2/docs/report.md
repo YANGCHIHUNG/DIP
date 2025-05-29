@@ -19,17 +19,15 @@
 
 此專案將核心功能拆分為多個模組，各模組職責如下：
 
-| 檔案／模組            | 職責說明                                                                                                                                           |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **main.py**      | 解析 CLI 參數（`--input_dir`、`--output`、`--detector`），呼叫 `stitch_images`，並儲存結果。                                                                     |
-| **loader.py**    | 封裝影像讀取與預處理邏輯，如縮放、色彩空間轉換等。                                                                                                                      |
-| **feature.py**   | `detect_and_compute(img, method)`：使用 ORB/SIFT/AKAZE 偵測關鍵點並計算描述子。                                                                               |
-| **matcher.py**   | `match_features(des1, des2)`：對描述子做暴力比對或 FLANN，並透過 Lowe’s ratio test 篩除錯配。                                                                      |
-| **estimator.py** | `estimate_homography(kps1, kps2, matches)`：以 RANSAC 強健估計 3×3 單應性矩陣 H。                                                                          |
-| **stitcher.py**  | `stitch_images(images)`：<br>1. 以第一張影像為基準，<br>2. 依序對每張影像呼叫 feature→matcher→estimator，<br>3. 使用 `cv2.warpPerspective` 投影，<br>4. 呼叫 blender 合併結果。 |
-| **blender.py**   | `warp_perspective_and_blend(base, warped)`：<br>1. 計算重疊區遮罩，<br>2. 以簡單線性加權（羽化）方式融合影像。                                                            |
-| **configs/**     | YAML 配置檔（如 `default.yaml`），可設定 RANSAC 閾值、特徵偵測器、輸出尺寸等參數。                                                                                        |
-| **tests/**       | 單元測試，覆蓋 `feature`、`matcher`、`stitcher`、`loader` 等核心模組。                                                                                         |
+| 檔案                           | 功能說明                                               |
+|--------------------------------------|------------------------------------------------------|
+| `config/settings.yaml`               | 拼接參數設定（特徵偵測器、匹配器、RANSAC、混合方式等）         |
+| `loader.py`                      | 影像讀取與前處理（批次載入、灰階轉換、調整大小）               |
+| `feature.py`                     | 特徵偵測與描述子計算（ORB、SIFT、AKAZE 等）                  |
+| `matcher.py`                     | 描述子匹配邏輯（BFMatcher、FlannBasedMatcher 與 Lowe’s ratio test） |
+| `transformer.py`                 | 仿射矩陣估算（RANSAC）、影像仿射變形與矩陣合成                 |
+| `blender.py`                     | 影像融合方法（羽化混合 feather、金字塔多頻帶 multiband）        |
+| `stitcher.py`                    | 主拼接流程整合：讀設定、載入影像、估算變換、Warp、混合、輸出      |                                                                               |
 
 ## 三、工作流程
 
@@ -145,7 +143,7 @@
 
 以下展示輸入影像與拼接後輸出結果示例，
 
-| 範例輸入影像 1 | 範例輸入影像 2 | 範例輸入影像 3 |
+| 影像 1 | 影像 2 | 影像 3 |
 |:--------------:|:--------------:|:--------------:|
 | ![範例輸入影像 1](../input/a.png) | ![範例輸入影像 2](../input/b.png) | ![範例輸入影像 3](../input/c.png) |
 
