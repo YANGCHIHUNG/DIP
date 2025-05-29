@@ -92,3 +92,10 @@ python inference_realesrgan.py \
   --tile 200 \
   --tile_pad 10
 
+
+python inference_realesrgan.py \
+  -n RealESRGAN_x4plus \
+  -i /Users/young/Desktop/20254.27.37.png \
+  --outscale 4 \
+  --tile 200 \
+  --tile_pad 10
