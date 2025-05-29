@@ -1,0 +1,9 @@
+# 基本影像處理與數值運算
+opencv-python           # OpenCV 核心功能
+numpy                   # 陣列與矩陣運算
+
+# 讀寫 YAML 設定檔
+PyYAML                  # 安全載入/轉存設定
+
+# （若想使用 SIFT、SURF 等進階演算法，需改裝 opencv-contrib）
+opencv-contrib-python   # 包含 contrib 模組：SIFT、SURF、xfeatures2d…

@@ -1,4 +1,0 @@
-numpy>=1.19.0                # 陣列運算
-opencv-contrib-python>=4.5.1 # 包含 SIFT 的 OpenCV
-PyYAML>=5.4.1                # 讀寫 YAML 設定檔
-pytest>=6.2.0  

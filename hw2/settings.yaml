@@ -1,0 +1,32 @@
+# Panorama Stitching Configuration
+
+feature:
+  type: ORB
+  params:
+    nfeatures: 2000
+
+matcher:
+  type: BF
+  params:
+    norm_type: NORM_HAMMING
+    cross_check: False
+  flann:
+    flann_index_params:
+      algorithm: 1
+      trees: 5
+    flann_search_params:
+      checks: 50
+
+match:
+  ratio_test: True
+  ratio: 0.75
+  top_k: 50
+
+ransac:
+  thresh: 5.0
+  max_iters: 2000
+
+blend:
+  method: feather
+  params:
+    blur_radius: 21
