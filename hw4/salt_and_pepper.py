@@ -1,5 +1,6 @@
 '''
-python salt_and_pepper.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/input/g_img.png /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_25.jpg --amount 0.5
+python salt_and_pepper.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/input/img.png /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_low.png --amount 0.2
+python salt_and_pepper.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/input/img.png /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_high.png --amount 0.5
 '''
 
 import cv2

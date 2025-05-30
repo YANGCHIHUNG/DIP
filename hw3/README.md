@@ -99,3 +99,18 @@ python inference_realesrgan.py \
   --outscale 4 \
   --tile 200 \
   --tile_pad 10
+
+
+
+圖像A: 二階微分邊緣圖 先加上 原圖           再乘上 一階微分正規化圖
+圖像B: 二階微分邊緣圖 先乘上 一階微分正規化圖 再加上 原圖
+圖像C: Super resolution
+
+Adaptive Median Filter vs Median Filter
+
+椒鹽雜訊
+P0 = P255 = 1/10, 使用3*3
+P0 = P255 = 1/4, 使用7*7
+
+AMF 和 MF 都是使用 3*3 或 7*7 嗎？
+

@@ -1,6 +1,6 @@
 '''
-python median_filter.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_01.jpg /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/denoised_01.jpg -k 3
-python median_filter.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_25.jpg /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/denoised_25.jpg -k 7
+python median_filter.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_low.png /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/denoised_low.png -k 3
+python median_filter.py /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/noisy_high.png /Users/young/Documents/nchu-2025-spring/DIP/hw4/output/denoised_high.png -k 7
 
 '''
 import cv2
