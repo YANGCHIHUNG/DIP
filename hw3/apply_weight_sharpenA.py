@@ -10,16 +10,16 @@ apply_weight_sharpenA.py
 使用：
   pip install pillow
   python apply_weight_sharpenA.py \
-      --original orig.jpg \
-      --sharpen sharpened.jpg \
+      --original orig.png \
+      --sharpen sharpened.png \
       --weight weight.png \
-      --output result.jpg
+      --output result.png
 
   python apply_weight_sharpenA.py \
-      --original /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png \
-      --sharpen /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/laplacian_sharpen.jpg \
-      --weight /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/weight.jpg \
-      --output /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/resultA.png
+      --original /Users/young/Documents/nchu-2025-spring/DIP/hw3/input/img.png \
+      --sharpen /Users/young/Documents/nchu-2025-spring/DIP/hw3/output/sharp2.png \
+      --weight /Users/young/Documents/nchu-2025-spring/DIP/hw3/output/weight.png \
+      --output /Users/young/Documents/nchu-2025-spring/DIP/hw3/output/resultA.png
 參數：
   --original   原始彩色影像路徑
   --sharpen    二階銳化後的彩色影像路徑
@@ -78,7 +78,7 @@ def main():
     args = parse_args()
     orig, sharp, wmap = load_images(args.original, args.sharpen, args.weight)
     result = apply_weight_fusion(orig, sharp, wmap)
-    result.save(args.output, format='JPEG', quality=95)
+    result.save(args.output, format='PNG', quality=95)
     print(f'已完成加權融合，結果存為：{args.output}')
 
 if __name__ == '__main__':

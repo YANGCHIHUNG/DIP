@@ -95,7 +95,7 @@ python inference_realesrgan.py \
 
 python inference_realesrgan.py \
   -n RealESRGAN_x4plus \
-  -i /Users/young/Desktop/20254.27.37.png \
+  -i /Users/young/Documents/nchu-2025-spring/DIP/hw3/input/img.png \
   --outscale 4 \
   --tile 200 \
   --tile_pad 10

@@ -11,7 +11,7 @@ laplacian.py
 使用：
   pip install pillow
   python laplacian.py input.jpg output.jpg
-  python laplacian.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/laplacian_img.jpg
+  python laplacian.py /Users/young/Documents/nchu-2025-spring/DIP/hw3/input/img.png /Users/young/Documents/nchu-2025-spring/DIP/hw3/output/edge2.png
 """
 
 import sys

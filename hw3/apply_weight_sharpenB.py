@@ -10,17 +10,17 @@ apply_weight_sharpenB.py
 使用：
   pip install pillow
   python apply_weight_sharpenB.py \
-      --original orig.jpg \
+      --original orig.png \
       --edge2 edge2.png \
       --weight weight.png \
-      --output resultB.jpg \
+      --output resultB.png \
       [--gamma 1.0]
 
     python apply_weight_sharpenB.py \
-        --original /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/input/img.png \
-        --edge2 /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/laplacian_img.jpg \
-        --weight /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/weight.png \
-        --output /Users/young/Documents/nchu-2025-spring/DIP/hw3/data/output/img_resultB.png
+        --original /Users/young/Documents/nchu-2025-spring/DIP/hw3/input/img.png \
+        --edge2 /Users/young/Documents/nchu-2025-spring/DIP/hw3/output/edge2.png \
+        --weight /Users/young/Documents/nchu-2025-spring/DIP/hw3/output/weight.png \
+        --output /Users/young/Documents/nchu-2025-spring/DIP/hw3/output/resultB.png
 
 參數：
   --original  原始彩色影像路徑
@@ -80,7 +80,7 @@ def main():
     args = parse_args()
     orig, edge2, weight = load_images(args.original, args.edge2, args.weight)
     result = apply_resultB(orig, edge2, weight, args.gamma)
-    result.save(args.output, format='JPEG', quality=95)
+    result.save(args.output, format='PNG', quality=95)
     print(f"已完成 resultB 融合，輸出：{args.output} (gamma={args.gamma})")
 
 if __name__ == '__main__':

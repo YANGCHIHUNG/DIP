@@ -4,3 +4,4 @@ bin/
 **venv/
 panorama_project.egg-info
 **/__pycache__/
+*.zip
